@@ -6,7 +6,7 @@ export function formatCurrency(value: number): string {
 }
 
 export function formatDate(dateStr: string): string {
-  return new Intl.DateTimeFormat('pt-BR').format(new Date(dateStr + 'T12:00:00'))
+  return new Intl.DateTimeFormat('pt-BR').format(new Date(dateStr.split('T')[0] + 'T12:00:00'))
 }
 
 export function formatCPF(cpf: string): string {
