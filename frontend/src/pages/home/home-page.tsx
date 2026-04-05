@@ -84,6 +84,20 @@ export function HomePage() {
           value={stats ? formatCurrency(stats.totalConsignedValue) : '—'}
           accentColor="#dc2626"
         />
+        {can('view', 'employees') && (
+          <KpiCard
+            label="Total de Servidores"
+            value={stats?.totalEmployees ?? '—'}
+            accentColor="#0ea5e9"
+          />
+        )}
+        {can('view', 'employees') && (
+          <KpiCard
+            label="Servidores com Consignação"
+            value={stats?.employeesWithConsignments ?? '—'}
+            accentColor="#8b5cf6"
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">

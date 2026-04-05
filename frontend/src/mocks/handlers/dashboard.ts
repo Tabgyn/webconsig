@@ -1,19 +1,21 @@
 import { http, HttpResponse } from 'msw'
 import { CONSIGNMENTS } from '../fixtures/consignments'
+import { EMPLOYEES } from '../fixtures/employees'
 import { PORTABILITIES } from '../fixtures/portabilities'
 import type { DashboardStats, Alert } from '@/types'
 
 export const dashboardHandlers = [
   http.get('/api/dashboard/stats', () => {
+    const activeConsignments = CONSIGNMENTS.filter((c) => c.status === 'active')
+    const employeeIdsWithActive = new Set(activeConsignments.map((c) => c.employeeId))
+
     const stats: DashboardStats = {
-      activeConsignments: CONSIGNMENTS.filter((c) => c.status === 'active').length,
+      activeConsignments: activeConsignments.length,
       pendingApproval: CONSIGNMENTS.filter((c) => c.status === 'pending').length,
       activePortabilities: PORTABILITIES.filter((p) => p.status === 'requested').length,
-      totalConsignedValue: CONSIGNMENTS
-        .filter((c) => c.status === 'active')
-        .reduce((sum, c) => sum + c.remainingBalance, 0),
-      totalEmployees: 1250,
-      employeesWithConsignments: 487,
+      totalConsignedValue: activeConsignments.reduce((sum, c) => sum + c.remainingBalance, 0),
+      totalEmployees: EMPLOYEES.length,
+      employeesWithConsignments: employeeIdsWithActive.size,
     }
     return HttpResponse.json(stats)
   }),
