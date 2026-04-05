@@ -34,3 +34,27 @@ Mock data via MSW (`src/mocks/`) during development. Removing MSW is the only ch
 - `DataTable` — filterable, sortable, paginated; columns and actions defined per page, actions gated by `can()`
 - `PageShell` — page wrapper with title, breadcrumb, top-right action slot
 - `StatusBadge` — unified badge for all status values
+
+## Frontend Development
+
+All commands run from `frontend/`:
+
+```bash
+npm run dev          # Start Vite dev server (MSW enabled automatically)
+npm run build        # Production build
+npm run test         # Run Vitest in watch mode
+npm run test:run     # Run tests once (CI)
+npx vitest run src/path/to/file.test.ts  # Run a single test file
+```
+
+## Test Accounts (dev only)
+
+All passwords: `password`
+
+| Email | Role |
+|---|---|
+| representante@bancalfa.com | Representante |
+| rh@prefeitura.gov.br | Gestor de RH |
+| servidor@prefeitura.gov.br | Servidor |
+| gestor@bancalfa.com | Gestor de Entidade |
+| admin@webconsig.com | Administrador |
