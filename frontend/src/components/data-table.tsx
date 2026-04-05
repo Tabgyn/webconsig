@@ -16,19 +16,19 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react'
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[]
+interface DataTableProps<TData> {
+  columns: ColumnDef<TData, any>[]
   data: TData[]
   searchPlaceholder?: string
   isLoading?: boolean
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData>({
   columns,
   data,
   searchPlaceholder,
   isLoading = false,
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [globalFilter, setGlobalFilter] = useState('')
   const [sorting, setSorting] = useState<SortingState>([])
 
