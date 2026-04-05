@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 import { api } from '@/lib/api'
 import { usePermissions } from '@/hooks/use-permissions'
@@ -7,16 +7,23 @@ import { PageShell } from '@/components/page-shell'
 import { DataTable } from '@/components/data-table'
 import { StatusBadge } from '@/components/status-badge'
 import { Button } from '@/components/ui/button'
-import type { Consignment } from '@/types'
+import type { Consignment, ConsignmentStatus } from '@/types'
 
 const col = createColumnHelper<Consignment>()
 
 export function ConsignmentsPage() {
   const { can } = usePermissions()
+  const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
     queryKey: ['consignments'],
     queryFn: () => api.get<{ data: Consignment[] }>('/consignments'),
+  })
+
+  const updateStatus = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: ConsignmentStatus }) =>
+      api.patch<{ data: Consignment }>(`/consignments/${id}`, { status }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['consignments'] }),
   })
 
   const columns = [
@@ -54,17 +61,41 @@ export function ConsignmentsPage() {
             cell: (info) => (
               <div className="flex gap-2">
                 {can('approve', 'consignment') && info.row.original.status === 'pending' && (
-                  <Button size="sm" variant="outline" className="text-green-700 border-green-300 hover:bg-green-50 h-7 text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-green-700 border-green-300 hover:bg-green-50 h-7 text-xs"
+                    disabled={updateStatus.isPending}
+                    onClick={() =>
+                      updateStatus.mutate({ id: info.row.original.id, status: 'active' })
+                    }
+                  >
                     Aprovar
                   </Button>
                 )}
                 {can('reject', 'consignment') && info.row.original.status === 'pending' && (
-                  <Button size="sm" variant="outline" className="text-red-700 border-red-300 hover:bg-red-50 h-7 text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-700 border-red-300 hover:bg-red-50 h-7 text-xs"
+                    disabled={updateStatus.isPending}
+                    onClick={() =>
+                      updateStatus.mutate({ id: info.row.original.id, status: 'cancelled' })
+                    }
+                  >
                     Rejeitar
                   </Button>
                 )}
                 {can('cancel', 'consignment') && info.row.original.status === 'active' && (
-                  <Button size="sm" variant="outline" className="text-slate-600 h-7 text-xs">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-slate-600 h-7 text-xs"
+                    disabled={updateStatus.isPending}
+                    onClick={() =>
+                      updateStatus.mutate({ id: info.row.original.id, status: 'cancelled' })
+                    }
+                  >
                     Cancelar
                   </Button>
                 )}
