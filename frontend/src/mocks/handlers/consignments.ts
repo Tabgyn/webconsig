@@ -3,7 +3,8 @@ import { CONSIGNMENTS } from '../fixtures/consignments'
 import type { Consignment, ConsignmentStatus } from '@/types'
 
 // Mutable in-memory copy — persists across requests in the same browser session
-let consignmentsData: Consignment[] = [...CONSIGNMENTS]
+// Exported so other handlers (e.g. dashboard) can read the live state
+export let consignmentsData: Consignment[] = [...CONSIGNMENTS]
 
 export const consignmentHandlers = [
   http.get('/api/consignments', () => {
