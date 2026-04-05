@@ -82,6 +82,8 @@ export interface DashboardStats {
   pendingApproval: number
   activePortabilities: number
   totalConsignedValue: number
+  totalEmployees: number
+  employeesWithConsignments: number
 }
 
 export type AlertType = 'warning' | 'info' | 'error'

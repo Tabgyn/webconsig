@@ -7,6 +7,8 @@ import { outstandingBalanceHandlers } from './handlers/outstanding-balance'
 import { deductionStatementHandlers } from './handlers/deduction-statement'
 import { rateRankingHandlers } from './handlers/rate-ranking'
 import { dashboardHandlers } from './handlers/dashboard'
+import { employeeHandlers } from './handlers/employees'
+import { reportHandlers } from './handlers/reports'
 
 export const worker = setupWorker(
   ...authHandlers,
@@ -17,4 +19,6 @@ export const worker = setupWorker(
   ...deductionStatementHandlers,
   ...rateRankingHandlers,
   ...dashboardHandlers,
+  ...employeeHandlers,
+  ...reportHandlers,
 )

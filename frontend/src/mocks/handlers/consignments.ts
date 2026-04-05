@@ -1,10 +1,14 @@
 import { http, HttpResponse } from 'msw'
 import { CONSIGNMENTS } from '../fixtures/consignments'
-import type { Consignment } from '@/types'
+import type { Consignment, ConsignmentStatus } from '@/types'
+
+// Mutable in-memory copy — persists across requests in the same browser session
+// Exported so other handlers (e.g. dashboard) can read the live state
+export let consignmentsData: Consignment[] = [...CONSIGNMENTS]
 
 export const consignmentHandlers = [
   http.get('/api/consignments', () => {
-    return HttpResponse.json({ data: CONSIGNMENTS, total: CONSIGNMENTS.length })
+    return HttpResponse.json({ data: consignmentsData, total: consignmentsData.length })
   }),
 
   http.post('/api/consignments', async ({ request }) => {
@@ -22,6 +26,19 @@ export const consignmentHandlers = [
       startDate: new Date().toISOString().split('T')[0],
       status: 'pending',
     }
+    consignmentsData = [...consignmentsData, newConsignment]
     return HttpResponse.json({ data: newConsignment }, { status: 201 })
+  }),
+
+  http.patch('/api/consignments/:id', async ({ params, request }) => {
+    const body = await request.json() as { status: ConsignmentStatus }
+    const index = consignmentsData.findIndex((c) => c.id === params.id)
+    if (index === -1) {
+      return HttpResponse.json({ message: 'Consignação não encontrada' }, { status: 404 })
+    }
+    consignmentsData = consignmentsData.map((c) =>
+      c.id === params.id ? { ...c, status: body.status } : c,
+    )
+    return HttpResponse.json({ data: consignmentsData[index] })
   }),
 ]
