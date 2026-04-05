@@ -9,6 +9,9 @@ import { SimulationPage } from '@/pages/simulation/simulation-page'
 import { OutstandingBalancePage } from '@/pages/outstanding-balance/outstanding-balance-page'
 import { DeductionStatementPage } from '@/pages/deduction-statement/deduction-statement-page'
 import { RateRankingPage } from '@/pages/rate-ranking/rate-ranking-page'
+import { EmployeesPage } from '@/pages/employees/employees-page'
+import { ReportsPage } from '@/pages/reports/reports-page'
+import { NotFoundPage } from '@/pages/not-found/not-found-page'
 
 export const router = createBrowserRouter([
   {
@@ -30,6 +33,9 @@ export const router = createBrowserRouter([
       { path: 'outstanding-balance', element: <OutstandingBalancePage /> },
       { path: 'deduction-statement', element: <DeductionStatementPage /> },
       { path: 'rate-ranking', element: <RateRankingPage /> },
+      { path: 'employees', element: <EmployeesPage /> },
+      { path: 'reports', element: <ReportsPage /> },
+      { path: '*', element: <NotFoundPage /> },
     ],
   },
 ])
