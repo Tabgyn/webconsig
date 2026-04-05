@@ -12,6 +12,8 @@ export const dashboardHandlers = [
       totalConsignedValue: CONSIGNMENTS
         .filter((c) => c.status === 'active')
         .reduce((sum, c) => sum + c.remainingBalance, 0),
+      totalEmployees: 1250,
+      employeesWithConsignments: 487,
     }
     return HttpResponse.json(stats)
   }),
