@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api'
+import { useCurrentUser } from '@/hooks/use-current-user'
 import { formatCurrency } from '@/lib/formatters'
 import { PageShell } from '@/components/page-shell'
 import { Button } from '@/components/ui/button'
@@ -11,7 +13,7 @@ import {
   Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
 } from '@/components/ui/form'
 import { Separator } from '@/components/ui/separator'
-import type { SimulationResult } from '@/types'
+import type { Employee, SimulationResult } from '@/types'
 
 const simulationSchema = z.object({
   installmentValue: z.coerce
@@ -31,8 +33,17 @@ const simulationSchema = z.object({
 type SimulationFormValues = z.infer<typeof simulationSchema>
 
 export function SimulationPage() {
+  const user = useCurrentUser()
   const [result, setResult] = useState<SimulationResult | null>(null)
   const [isCalculating, setIsCalculating] = useState(false)
+
+  const { data: employeeData } = useQuery({
+    queryKey: ['employee', user.employeeId],
+    queryFn: () => api.get<{ data: Employee }>(`/employees/${user.employeeId}`),
+    enabled: user.role === 'employee' && !!user.employeeId,
+  })
+
+  const employee = employeeData?.data
 
   const form = useForm<SimulationFormValues>({
     resolver: zodResolver(simulationSchema),
@@ -54,6 +65,21 @@ export function SimulationPage() {
       title="Simulação de Empréstimo"
       description="Calcule o valor liberado e o custo total de um empréstimo consignado."
     >
+      {employee && (
+        <div className="rounded-lg border bg-blue-50 px-4 py-3 text-sm text-blue-800 flex gap-6">
+          <span>
+            <span className="font-semibold">Salário Bruto:</span>{' '}
+            {formatCurrency(employee.grossSalary)}
+          </span>
+          {employee.availableMargin !== undefined && (
+            <span>
+              <span className="font-semibold">Margem Disponível:</span>{' '}
+              {formatCurrency(employee.availableMargin)}
+            </span>
+          )}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Input form */}
         <div className="rounded-lg border bg-white p-6 shadow-sm">
