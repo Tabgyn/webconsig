@@ -9,6 +9,7 @@ import { rateRankingHandlers } from './handlers/rate-ranking'
 import { dashboardHandlers } from './handlers/dashboard'
 import { employeeHandlers } from './handlers/employees'
 import { reportHandlers } from './handlers/reports'
+import { institutionHandlers } from './handlers/institutions'
 
 export const worker = setupWorker(
   ...authHandlers,
@@ -21,4 +22,5 @@ export const worker = setupWorker(
   ...dashboardHandlers,
   ...employeeHandlers,
   ...reportHandlers,
+  ...institutionHandlers,
 )
