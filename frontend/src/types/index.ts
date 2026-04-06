@@ -84,6 +84,10 @@ export interface DashboardStats {
   totalConsignedValue: number
   totalEmployees: number
   employeesWithConsignments: number
+  // Populated only when ?employeeId= is in the request (employee self-service view)
+  myActiveConsignments?: number
+  myNextDeduction?: number  // installment value of the next payment
+  myTotalDebt?: number      // total remaining balance across active + pending consignments
 }
 
 export type AlertType = 'warning' | 'info' | 'error'
