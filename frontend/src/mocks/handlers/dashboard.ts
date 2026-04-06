@@ -1,24 +1,44 @@
 import { http, HttpResponse } from 'msw'
 import { consignmentsData } from './consignments'
+import { portabilitiesData } from './portability'
+import { representativesData } from './institutions'
 import { EMPLOYEES } from '../fixtures/employees'
-import { PORTABILITIES } from '../fixtures/portabilities'
 import type { DashboardStats, Alert } from '@/types'
 
 export const dashboardHandlers = [
   http.get('/api/dashboard/stats', ({ request }) => {
     const url = new URL(request.url)
     const employeeId = url.searchParams.get('employeeId')
+    const institutionId = url.searchParams.get('institutionId')
 
-    const activeConsignments = consignmentsData.filter((c) => c.status === 'active')
+    const baseConsignments = institutionId
+      ? consignmentsData.filter((c) => c.institutionId === institutionId)
+      : consignmentsData
+
+    const activeConsignments = baseConsignments.filter((c) => c.status === 'active')
     const employeeIdsWithActive = new Set(activeConsignments.map((c) => c.employeeId))
+
+    const basePortabilities = institutionId
+      ? portabilitiesData.filter(
+          (p) =>
+            p.originInstitutionId === institutionId ||
+            p.destinationInstitutionId === institutionId,
+        )
+      : portabilitiesData
 
     const stats: DashboardStats = {
       activeConsignments: activeConsignments.length,
-      pendingApproval: consignmentsData.filter((c) => c.status === 'pending').length,
-      activePortabilities: PORTABILITIES.filter((p) => p.status === 'requested').length,
+      pendingApproval: baseConsignments.filter((c) => c.status === 'pending').length,
+      activePortabilities: basePortabilities.filter((p) => p.status === 'requested').length,
       totalConsignedValue: activeConsignments.reduce((sum, c) => sum + c.remainingBalance, 0),
       totalEmployees: EMPLOYEES.length,
       employeesWithConsignments: employeeIdsWithActive.size,
+    }
+
+    if (institutionId) {
+      stats.institutionActiveRepresentatives = representativesData.filter(
+        (r) => r.institutionId === institutionId && r.isActive,
+      ).length
     }
 
     if (employeeId) {

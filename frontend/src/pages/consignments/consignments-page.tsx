@@ -18,10 +18,15 @@ export function ConsignmentsPage() {
   const queryClient = useQueryClient()
 
   const employeeId = user.role === 'employee' ? user.employeeId : undefined
-  const path = employeeId ? `/consignments?employeeId=${employeeId}` : '/consignments'
+  const institutionId = user.role === 'institution_manager' ? user.institutionId : undefined
+  const path = employeeId
+    ? `/consignments?employeeId=${employeeId}`
+    : institutionId
+    ? `/consignments?institutionId=${institutionId}`
+    : '/consignments'
 
   const { data, isLoading } = useQuery({
-    queryKey: ['consignments', employeeId],
+    queryKey: ['consignments', employeeId, institutionId],
     queryFn: () => api.get<{ data: Consignment[] }>(path),
   })
 

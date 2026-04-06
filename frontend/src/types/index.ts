@@ -47,6 +47,14 @@ export interface Institution {
   isActive: boolean
 }
 
+export interface Representative {
+  id: string
+  name: string
+  email: string
+  institutionId: string
+  isActive: boolean
+}
+
 export type PortabilityStatus = 'requested' | 'approved' | 'rejected'
 
 export interface Portability {
@@ -88,6 +96,7 @@ export interface DashboardStats {
   myActiveConsignments?: number
   myNextDeduction?: number  // installment value of the next payment
   myTotalDebt?: number      // total remaining balance across active + pending consignments
+  institutionActiveRepresentatives?: number // populated when ?institutionId= is provided
 }
 
 export type AlertType = 'warning' | 'info' | 'error'

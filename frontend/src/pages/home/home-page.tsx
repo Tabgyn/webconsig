@@ -34,21 +34,25 @@ export function HomePage() {
   const navigate = useNavigate()
 
   const employeeId = user.role === 'employee' ? user.employeeId : undefined
+  const institutionId = user.role === 'institution_manager' ? user.institutionId : undefined
 
   const { data: stats } = useQuery({
-    queryKey: ['dashboard', 'stats', employeeId],
+    queryKey: ['dashboard', 'stats', employeeId, institutionId],
     queryFn: () => {
-      const path = employeeId
-        ? `/dashboard/stats?employeeId=${employeeId}`
-        : '/dashboard/stats'
-      return api.get<DashboardStats>(path)
+      if (employeeId) return api.get<DashboardStats>(`/dashboard/stats?employeeId=${employeeId}`)
+      if (institutionId) return api.get<DashboardStats>(`/dashboard/stats?institutionId=${institutionId}`)
+      return api.get<DashboardStats>('/dashboard/stats')
     },
   })
 
   const { data: consignmentsResponse } = useQuery({
-    queryKey: ['consignments', employeeId],
+    queryKey: ['consignments', employeeId, institutionId],
     queryFn: () => {
-      const path = employeeId ? `/consignments?employeeId=${employeeId}` : '/consignments'
+      const path = employeeId
+        ? `/consignments?employeeId=${employeeId}`
+        : institutionId
+        ? `/consignments?institutionId=${institutionId}`
+        : '/consignments'
       return api.get<{ data: Consignment[] }>(path)
     },
   })
@@ -126,6 +130,13 @@ export function HomePage() {
                 label="Servidores com Consignação"
                 value={stats?.employeesWithConsignments ?? '—'}
                 accentColor="#8b5cf6"
+              />
+            )}
+            {stats?.institutionActiveRepresentatives !== undefined && (
+              <KpiCard
+                label="Representantes Ativos"
+                value={stats.institutionActiveRepresentatives}
+                accentColor="#0891b2"
               />
             )}
           </>
