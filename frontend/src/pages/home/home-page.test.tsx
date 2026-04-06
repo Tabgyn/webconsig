@@ -44,17 +44,36 @@ const employeeAuth = {
   logout: vi.fn(),
 }
 
-function renderPage() {
+const institutionManagerUser: CurrentUser = {
+  id: 'u-4',
+  name: 'Ana Costa',
+  email: 'gestor@bancalfa.com',
+  role: 'institution_manager',
+  institutionId: 'inst-1',
+}
+const institutionManagerAuth = {
+  user: institutionManagerUser,
+  token: 'tok',
+  isAuthenticated: true,
+  login: vi.fn(),
+  logout: vi.fn(),
+}
+
+function renderAs(auth: typeof employeeAuth | typeof institutionManagerAuth) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
     <QueryClientProvider client={qc}>
-      <AuthContext.Provider value={employeeAuth}>
+      <AuthContext.Provider value={auth}>
         <MemoryRouter>
           <HomePage />
         </MemoryRouter>
       </AuthContext.Provider>
     </QueryClientProvider>,
   )
+}
+
+function renderPage() {
+  return renderAs(employeeAuth)
 }
 
 describe('HomePage — employee view', () => {
@@ -80,5 +99,15 @@ describe('HomePage — employee view', () => {
     expect(
       paths.some((p) => p.includes('/consignments') && p.includes('employeeId=emp-1')),
     ).toBe(true)
+  })
+})
+
+describe('HomePage — institution_manager', () => {
+  beforeEach(() => mockGet.mockClear())
+
+  it('fetches dashboard stats scoped to the institution', async () => {
+    renderAs(institutionManagerAuth)
+    expect(await screen.findByText(/bom/i)).toBeInTheDocument()
+    expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('institutionId=inst-1'))
   })
 })
