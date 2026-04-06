@@ -10,9 +10,10 @@ export const consignmentHandlers = [
   http.get('/api/consignments', ({ request }) => {
     const url = new URL(request.url)
     const employeeId = url.searchParams.get('employeeId')
-    const result = employeeId
-      ? consignmentsData.filter((c) => c.employeeId === employeeId)
-      : consignmentsData
+    const institutionId = url.searchParams.get('institutionId')
+    let result = consignmentsData
+    if (employeeId) result = result.filter((c) => c.employeeId === employeeId)
+    if (institutionId) result = result.filter((c) => c.institutionId === institutionId)
     return HttpResponse.json({ data: result, total: result.length })
   }),
 

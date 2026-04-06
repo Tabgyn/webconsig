@@ -47,6 +47,21 @@ const employeeUser: CurrentUser = {
 }
 const employeeAuth = { user: employeeUser, token: 'tok', isAuthenticated: true, login: vi.fn(), logout: vi.fn() }
 
+const institutionManagerUser: CurrentUser = {
+  id: 'u-4',
+  name: 'Ana Costa',
+  email: 'gestor@bancalfa.com',
+  role: 'institution_manager',
+  institutionId: 'inst-1',
+}
+const institutionManagerAuth = {
+  user: institutionManagerUser,
+  token: 'tok',
+  isAuthenticated: true,
+  login: vi.fn(),
+  logout: vi.fn(),
+}
+
 function renderAs(auth: typeof hrAuth) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   return render(
@@ -93,5 +108,15 @@ describe('ConsignmentsPage — employee scope', () => {
     await screen.findByText('Consignações')
     expect(screen.queryByRole('button', { name: /aprovar/i })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: /rejeitar/i })).not.toBeInTheDocument()
+  })
+})
+
+describe('ConsignmentsPage — institution_manager scope', () => {
+  beforeEach(() => mockGet.mockClear())
+
+  it('fetches consignments scoped to the logged-in institution', async () => {
+    renderAs(institutionManagerAuth)
+    expect(await screen.findByText('Consignações')).toBeInTheDocument()
+    expect(mockGet).toHaveBeenCalledWith('/consignments?institutionId=inst-1')
   })
 })

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 import { api } from '@/lib/api'
 import { usePermissions } from '@/hooks/use-permissions'
+import { useCurrentUser } from '@/hooks/use-current-user'
 import { formatDate } from '@/lib/formatters'
 import { PageShell } from '@/components/page-shell'
 import { DataTable } from '@/components/data-table'
@@ -13,10 +14,15 @@ const col = createColumnHelper<Portability>()
 
 export function PortabilityPage() {
   const { can } = usePermissions()
+  const user = useCurrentUser()
+  const institutionId = user.role === 'institution_manager' ? user.institutionId : undefined
 
   const { data, isLoading } = useQuery({
-    queryKey: ['portability'],
-    queryFn: () => api.get<{ data: Portability[] }>('/portability'),
+    queryKey: ['portability', institutionId],
+    queryFn: () => {
+      const path = institutionId ? `/portability?institutionId=${institutionId}` : '/portability'
+      return api.get<{ data: Portability[] }>(path)
+    },
   })
 
   const columns = [
