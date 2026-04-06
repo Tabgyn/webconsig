@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { PORTABILITIES } from '../fixtures/portabilities'
-import type { Portability } from '@/types'
+import type { Portability, PortabilityStatus } from '@/types'
 
 export let portabilitiesData: Portability[] = [...PORTABILITIES]
 
@@ -30,5 +30,17 @@ export const portabilityHandlers = [
     }
     portabilitiesData = [...portabilitiesData, newPortability]
     return HttpResponse.json({ data: newPortability }, { status: 201 })
+  }),
+
+  http.patch('/api/portability/:id', async ({ params, request }) => {
+    const body = await request.json() as { status: PortabilityStatus }
+    portabilitiesData = portabilitiesData.map((p) =>
+      p.id === params.id ? { ...p, status: body.status } : p,
+    )
+    const updated = portabilitiesData.find((p) => p.id === params.id)
+    if (!updated) {
+      return HttpResponse.json({ message: 'Portabilidade não encontrada' }, { status: 404 })
+    }
+    return HttpResponse.json({ data: updated })
   }),
 ]

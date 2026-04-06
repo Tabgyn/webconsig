@@ -46,9 +46,13 @@ export function HomePage() {
   })
 
   const { data: consignmentsResponse } = useQuery({
-    queryKey: ['consignments', employeeId],
+    queryKey: ['consignments', employeeId, institutionId],
     queryFn: () => {
-      const path = employeeId ? `/consignments?employeeId=${employeeId}` : '/consignments'
+      const path = employeeId
+        ? `/consignments?employeeId=${employeeId}`
+        : institutionId
+        ? `/consignments?institutionId=${institutionId}`
+        : '/consignments'
       return api.get<{ data: Consignment[] }>(path)
     },
   })
