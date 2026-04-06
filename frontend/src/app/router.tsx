@@ -11,6 +11,7 @@ import { DeductionStatementPage } from '@/pages/deduction-statement/deduction-st
 import { RateRankingPage } from '@/pages/rate-ranking/rate-ranking-page'
 import { EmployeesPage } from '@/pages/employees/employees-page'
 import { ReportsPage } from '@/pages/reports/reports-page'
+import { InstitutionsPage } from '@/pages/institutions/institutions-page'
 import { NotFoundPage } from '@/pages/not-found/not-found-page'
 
 export const router = createBrowserRouter([
@@ -35,6 +36,7 @@ export const router = createBrowserRouter([
       { path: 'rate-ranking', element: <RateRankingPage /> },
       { path: 'employees', element: <EmployeesPage /> },
       { path: 'reports', element: <ReportsPage /> },
+      { path: 'institutions', element: <InstitutionsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
