@@ -7,17 +7,15 @@ import type { CurrentUser } from '@/types'
 import { ReportsPage } from './reports-page'
 
 vi.mock('@/lib/api', () => ({
-  api: { post: vi.fn().mockResolvedValue({}) },
+  api: { post: vi.fn().mockResolvedValue({ message: 'ok' }) },
 }))
 
-const hrUser: CurrentUser = { id: 'u1', name: 'RH User', email: 'rh@test.com', role: 'hr_manager' }
-const mockAuth = { user: hrUser, token: 'tok', isAuthenticated: true, login: vi.fn(), logout: vi.fn() }
-
-function renderPage() {
+function renderAs(user: CurrentUser) {
   const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+  const auth = { user, token: 'tok', isAuthenticated: true, login: vi.fn(), logout: vi.fn() }
   return render(
     <QueryClientProvider client={qc}>
-      <AuthContext.Provider value={mockAuth}>
+      <AuthContext.Provider value={auth}>
         <MemoryRouter>
           <ReportsPage />
         </MemoryRouter>
@@ -26,15 +24,27 @@ function renderPage() {
   )
 }
 
+const representativeUser: CurrentUser = {
+  id: 'u-1', name: 'João Silva', email: 'representante@bancalfa.com',
+  role: 'representative', institutionId: 'inst-1',
+}
+
+const institutionManagerUser: CurrentUser = {
+  id: 'u-4', name: 'Ana Costa', email: 'gestor@bancalfa.com',
+  role: 'institution_manager', institutionId: 'inst-1',
+}
+
 describe('ReportsPage', () => {
-  it('renders page title', () => {
-    renderPage()
-    expect(screen.getByText('Relatórios')).toBeInTheDocument()
+  it('shows standard report types for representative', () => {
+    renderAs(representativeUser)
+    expect(screen.getByText('Consignações')).toBeInTheDocument()
+    expect(screen.getByText('Servidores')).toBeInTheDocument()
+    expect(screen.getByText('Descontos')).toBeInTheDocument()
+    expect(screen.queryByText('Atividade de Representantes')).not.toBeInTheDocument()
   })
 
-  it('renders export buttons for each report type', () => {
-    renderPage()
-    const buttons = screen.getAllByRole('button', { name: /exportar/i })
-    expect(buttons.length).toBeGreaterThan(0)
+  it('shows Atividade de Representantes only for institution_manager', () => {
+    renderAs(institutionManagerUser)
+    expect(screen.getByText('Atividade de Representantes')).toBeInTheDocument()
   })
 })
