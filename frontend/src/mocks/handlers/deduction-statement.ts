@@ -6,9 +6,11 @@ export const deductionStatementHandlers = [
   http.get('/api/deduction-statement', ({ request }) => {
     const url = new URL(request.url)
     const competence = url.searchParams.get('competence') ?? '2026-03'
+    const employeeId = url.searchParams.get('employeeId')
 
     const data: DeductionEntry[] = CONSIGNMENTS
       .filter((c) => c.status === 'active' || c.status === 'pending')
+      .filter((c) => !employeeId || c.employeeId === employeeId)
       .map((c, i) => ({
         id: `ded-${i + 1}`,
         consignmentId: c.id,

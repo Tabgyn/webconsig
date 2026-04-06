@@ -5,7 +5,10 @@ import { PORTABILITIES } from '../fixtures/portabilities'
 import type { DashboardStats, Alert } from '@/types'
 
 export const dashboardHandlers = [
-  http.get('/api/dashboard/stats', () => {
+  http.get('/api/dashboard/stats', ({ request }) => {
+    const url = new URL(request.url)
+    const employeeId = url.searchParams.get('employeeId')
+
     const activeConsignments = consignmentsData.filter((c) => c.status === 'active')
     const employeeIdsWithActive = new Set(activeConsignments.map((c) => c.employeeId))
 
@@ -17,6 +20,18 @@ export const dashboardHandlers = [
       totalEmployees: EMPLOYEES.length,
       employeesWithConsignments: employeeIdsWithActive.size,
     }
+
+    if (employeeId) {
+      const mine = consignmentsData.filter(
+        (c) => c.employeeId === employeeId && (c.status === 'active' || c.status === 'pending'),
+      )
+      stats.myActiveConsignments = mine.length
+      stats.myTotalDebt = mine.reduce((sum, c) => sum + c.remainingBalance, 0)
+      stats.myNextDeduction = mine.length > 0
+        ? Math.min(...mine.map((c) => c.installmentValue))
+        : 0
+    }
+
     return HttpResponse.json(stats)
   }),
 

@@ -33,14 +33,24 @@ export function HomePage() {
   const user = useCurrentUser()
   const navigate = useNavigate()
 
+  const employeeId = user.role === 'employee' ? user.employeeId : undefined
+
   const { data: stats } = useQuery({
-    queryKey: ['dashboard', 'stats'],
-    queryFn: () => api.get<DashboardStats>('/dashboard/stats'),
+    queryKey: ['dashboard', 'stats', employeeId],
+    queryFn: () => {
+      const path = employeeId
+        ? `/dashboard/stats?employeeId=${employeeId}`
+        : '/dashboard/stats'
+      return api.get<DashboardStats>(path)
+    },
   })
 
   const { data: consignmentsResponse } = useQuery({
-    queryKey: ['consignments'],
-    queryFn: () => api.get<{ data: Consignment[] }>('/consignments'),
+    queryKey: ['consignments', employeeId],
+    queryFn: () => {
+      const path = employeeId ? `/consignments?employeeId=${employeeId}` : '/consignments'
+      return api.get<{ data: Consignment[] }>(path)
+    },
   })
 
   const recentConsignments = (consignmentsResponse?.data ?? []).slice(0, 10)
@@ -58,45 +68,67 @@ export function HomePage() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard
-          label="Consignações Ativas"
-          value={stats?.activeConsignments ?? '—'}
-          accentColor="#2563eb"
-        />
-        {can('approve', 'consignment') && (
-          <KpiCard
-            label="Pendentes de Aprovação"
-            value={stats?.pendingApproval ?? '—'}
-            trend={stats?.pendingApproval ? 'Requer atenção' : undefined}
-            accentColor="#f59e0b"
-          />
-        )}
-        {can('view', 'portability') && (
-          <KpiCard
-            label="Portabilidades"
-            value={stats?.activePortabilities ?? '—'}
-            trend="Em andamento"
-            accentColor="#22c55e"
-          />
-        )}
-        <KpiCard
-          label="Valor Total Consignado"
-          value={stats ? formatCurrency(stats.totalConsignedValue) : '—'}
-          accentColor="#dc2626"
-        />
-        {can('view', 'employees') && (
-          <KpiCard
-            label="Total de Servidores"
-            value={stats?.totalEmployees ?? '—'}
-            accentColor="#0ea5e9"
-          />
-        )}
-        {can('view', 'employees') && (
-          <KpiCard
-            label="Servidores com Consignação"
-            value={stats?.employeesWithConsignments ?? '—'}
-            accentColor="#8b5cf6"
-          />
+        {user.role === 'employee' ? (
+          <>
+            <KpiCard
+              label="Consignações Ativas"
+              value={stats?.myActiveConsignments ?? '—'}
+              accentColor="#2563eb"
+            />
+            <KpiCard
+              label="Próxima Parcela"
+              value={stats?.myNextDeduction !== undefined ? formatCurrency(stats.myNextDeduction) : '—'}
+              accentColor="#f59e0b"
+            />
+            <KpiCard
+              label="Saldo Devedor Total"
+              value={stats?.myTotalDebt !== undefined ? formatCurrency(stats.myTotalDebt) : '—'}
+              accentColor="#dc2626"
+            />
+          </>
+        ) : (
+          <>
+            <KpiCard
+              label="Consignações Ativas"
+              value={stats?.activeConsignments ?? '—'}
+              accentColor="#2563eb"
+            />
+            {can('approve', 'consignment') && (
+              <KpiCard
+                label="Pendentes de Aprovação"
+                value={stats?.pendingApproval ?? '—'}
+                trend={stats?.pendingApproval ? 'Requer atenção' : undefined}
+                accentColor="#f59e0b"
+              />
+            )}
+            {can('view', 'portability') && (
+              <KpiCard
+                label="Portabilidades"
+                value={stats?.activePortabilities ?? '—'}
+                trend="Em andamento"
+                accentColor="#22c55e"
+              />
+            )}
+            <KpiCard
+              label="Valor Total Consignado"
+              value={stats ? formatCurrency(stats.totalConsignedValue) : '—'}
+              accentColor="#dc2626"
+            />
+            {can('view', 'employees') && (
+              <KpiCard
+                label="Total de Servidores"
+                value={stats?.totalEmployees ?? '—'}
+                accentColor="#0ea5e9"
+              />
+            )}
+            {can('view', 'employees') && (
+              <KpiCard
+                label="Servidores com Consignação"
+                value={stats?.employeesWithConsignments ?? '—'}
+                accentColor="#8b5cf6"
+              />
+            )}
+          </>
         )}
       </div>
 
