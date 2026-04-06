@@ -7,8 +7,13 @@ import type { Consignment, ConsignmentStatus } from '@/types'
 export let consignmentsData: Consignment[] = [...CONSIGNMENTS]
 
 export const consignmentHandlers = [
-  http.get('/api/consignments', () => {
-    return HttpResponse.json({ data: consignmentsData, total: consignmentsData.length })
+  http.get('/api/consignments', ({ request }) => {
+    const url = new URL(request.url)
+    const employeeId = url.searchParams.get('employeeId')
+    const result = employeeId
+      ? consignmentsData.filter((c) => c.employeeId === employeeId)
+      : consignmentsData
+    return HttpResponse.json({ data: result, total: result.length })
   }),
 
   http.post('/api/consignments', async ({ request }) => {

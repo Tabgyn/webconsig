@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 import { api } from '@/lib/api'
 import { usePermissions } from '@/hooks/use-permissions'
+import { useCurrentUser } from '@/hooks/use-current-user'
 import { formatCurrency, formatDate, formatPercentage } from '@/lib/formatters'
 import { PageShell } from '@/components/page-shell'
 import { DataTable } from '@/components/data-table'
@@ -13,11 +14,15 @@ const col = createColumnHelper<Consignment>()
 
 export function ConsignmentsPage() {
   const { can } = usePermissions()
+  const user = useCurrentUser()
   const queryClient = useQueryClient()
 
+  const employeeId = user.role === 'employee' ? user.employeeId : undefined
+  const path = employeeId ? `/consignments?employeeId=${employeeId}` : '/consignments'
+
   const { data, isLoading } = useQuery({
-    queryKey: ['consignments'],
-    queryFn: () => api.get<{ data: Consignment[] }>('/consignments'),
+    queryKey: ['consignments', employeeId],
+    queryFn: () => api.get<{ data: Consignment[] }>(path),
   })
 
   const updateStatus = useMutation({
@@ -28,7 +33,10 @@ export function ConsignmentsPage() {
 
   const columns = [
     col.accessor('id', { header: 'Nº' }),
-    col.accessor('employeeId', { header: 'Matrícula' }),
+    // Hide the employeeId column when the employee is viewing their own consignments
+    ...(user.role !== 'employee'
+      ? [col.accessor('employeeId', { header: 'Matrícula' })]
+      : []),
     col.accessor('institutionId', { header: 'Entidade' }),
     col.accessor('installmentValue', {
       header: 'Parcela (R$)',
