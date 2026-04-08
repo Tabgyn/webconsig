@@ -11,6 +11,8 @@ import { employeeHandlers } from './handlers/employees'
 import { reportHandlers } from './handlers/reports'
 import { institutionHandlers } from './handlers/institutions'
 import { auditHandlers } from './handlers/audit'
+import { userHandlers } from './handlers/users'
+import { settingsHandlers } from './handlers/settings'
 
 export const worker = setupWorker(
   ...authHandlers,
@@ -25,4 +27,6 @@ export const worker = setupWorker(
   ...reportHandlers,
   ...institutionHandlers,
   ...auditHandlers,
+  ...userHandlers,
+  ...settingsHandlers,
 )

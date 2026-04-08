@@ -12,6 +12,9 @@ import { RateRankingPage } from '@/pages/rate-ranking/rate-ranking-page'
 import { EmployeesPage } from '@/pages/employees/employees-page'
 import { ReportsPage } from '@/pages/reports/reports-page'
 import { InstitutionsPage } from '@/pages/institutions/institutions-page'
+import { UsersPage } from '@/pages/users/users-page'
+import { AuditPage } from '@/pages/audit/audit-page'
+import { SettingsPage } from '@/pages/settings/settings-page'
 import { NotFoundPage } from '@/pages/not-found/not-found-page'
 
 export const router = createBrowserRouter([
@@ -37,6 +40,9 @@ export const router = createBrowserRouter([
       { path: 'employees', element: <EmployeesPage /> },
       { path: 'reports', element: <ReportsPage /> },
       { path: 'institutions', element: <InstitutionsPage /> },
+      { path: 'users', element: <UsersPage /> },
+      { path: 'audit', element: <AuditPage /> },
+      { path: 'settings', element: <SettingsPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
