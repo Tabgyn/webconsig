@@ -186,6 +186,16 @@ export function HomePage() {
                   Gerar Extrato
                 </Button>
               )}
+              {can('view', 'users') && (
+                <Button variant="outline" className="w-full" onClick={() => navigate('/users')}>
+                  Gerenciar Usuários
+                </Button>
+              )}
+              {can('view', 'audit') && (
+                <Button variant="outline" className="w-full" onClick={() => navigate('/audit')}>
+                  Auditoria do Sistema
+                </Button>
+              )}
             </div>
           </div>
 

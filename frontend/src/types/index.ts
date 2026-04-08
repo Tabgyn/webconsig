@@ -113,3 +113,33 @@ export interface SimulationResult {
   totalValue: number
   financingCost: number
 }
+
+export type AuditAction = 'create' | 'update' | 'delete' | 'approve' | 'reject' | 'login' | 'logout'
+
+export type AuditResource =
+  | 'consignment'
+  | 'portability'
+  | 'user'
+  | 'institution'
+  | 'representative'
+  | 'settings'
+  | 'session'
+
+export interface AuditEntry {
+  id: string
+  userId: string
+  userName: string
+  action: AuditAction
+  resource: AuditResource
+  resourceId: string
+  description: string
+  timestamp: string   // ISO datetime
+  ipAddress: string
+}
+
+export interface SystemSetting {
+  key: string
+  label: string
+  value: string
+  description: string
+}
