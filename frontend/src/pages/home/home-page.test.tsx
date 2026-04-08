@@ -111,3 +111,27 @@ describe('HomePage — institution_manager', () => {
     expect(mockGet).toHaveBeenCalledWith(expect.stringContaining('institutionId=inst-1'))
   })
 })
+
+const adminUser: CurrentUser = {
+  id: 'u-5',
+  name: 'Admin Sistema',
+  email: 'admin@webconsig.com',
+  role: 'admin',
+}
+const adminAuth = {
+  user: adminUser,
+  token: 'tok',
+  isAuthenticated: true,
+  login: vi.fn(),
+  logout: vi.fn(),
+}
+
+describe('HomePage — admin', () => {
+  beforeEach(() => mockGet.mockClear())
+
+  it('shows admin quick action buttons for users and audit', async () => {
+    renderAs(adminAuth)
+    expect(await screen.findByRole('button', { name: /gerenciar usuários/i })).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: /auditoria do sistema/i })).toBeInTheDocument()
+  })
+})
